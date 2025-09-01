@@ -1,0 +1,211 @@
+:root {
+  --bg: #000000;
+  --card-bg: #e0e0e0;
+  --text: #111827;
+  --outline: #333; /* container outline color */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== Grid ===== */
+.grid {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  min-height: 100%;
+}
+
+/* Laptops & bigger: fixed 9×? layout (each row sums to 9) */
+@media (min-width: 1024px) {
+  html, body {
+    overflow: hidden;   /* no scroll */
+    height: 100%;
+    width: 100%;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+    padding: 8px;
+    align-items: stretch;   /* Make all items in a row stretch to same row height */
+    justify-items: stretch; /* Cards span full available space in their grid cell */
+    max-width: 1820px;      /* Centers and keeps tight on large screens */
+    margin: 0 auto;
+  }
+}
+
+/* Tablets (600px–1023px): 3–4 column grid */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    padding: 12px;
+  }
+  .card {
+    font-size: 0.95rem;
+  }
+  .time {
+    font-size: 1.5rem;
+  }
+}
+
+/* Small screens (max 400px) */
+@media (max-width: 400px) {
+  .flags img { width: 22px; }
+  .time { font-size: 1.2rem; }
+}
+
+/* Ultra-wide screens (≥1600px): scale up fonts */
+@media (min-width: 1600px) {
+  .country { font-size: 1.6rem; }
+  .time { font-size: 2.4rem; }
+  .utc, .date { font-size: 1.1rem; }
+  .bar-chip { font-size: 1.3rem; padding: 6px 10px; }
+  .center-bar-chip { font-size: 1.25rem; padding: 8px 14px; }
+  .legend-text { font-size: 1.15rem; }
+}
+
+/* ====== Bar-Container (encloses bar + its cards) ====== */
+.bar-container {
+  display: grid;
+  grid-template-rows: auto 1fr;  /* bar on top, cards below */
+  gap: 6px;
+  outline: 2.5px solid rgb(141, 141, 162); /* thick border */
+  outline-offset: 0;
+  border-radius: 12px;
+  padding: 4px;                  /* compact; keeps card sizes comfortable */
+  background: transparent;       /* no background change */
+}
+
+/* Column spans for 9-col parent grid */
+.span-1 { grid-column: span 1; }
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+
+/* ===== Bar (label) ===== */
+.bar-chip {
+  border-radius: 12px;
+  background: var(--card-bg); /* lighter metallic gray */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: clamp(.9rem, 1.1vw, 1.1rem);
+  padding: 4px 6px;
+  min-height: 16px;
+  text-align: center;
+}
+
+/* ===== Cards grid inside each container ===== */
+.grid-cards {
+  display: grid;
+  gap: 6px;
+}
+
+/* The inner cards grid columns match the bar span */
+.bar-container[data-span="1"] .grid-cards { grid-template-columns: repeat(1, 1fr); }
+.bar-container[data-span="2"] .grid-cards { grid-template-columns: repeat(2, 1fr); }
+.bar-container[data-span="3"] .grid-cards { grid-template-columns: repeat(3, 1fr); }
+
+.card {
+  display: flex;          /* Internal flexbox for centering */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;           /* Important: follows the tallest card in row */
+  border-radius: 20px;
+  background: var(--card-bg);
+  text-align: center;
+  padding: 8px;
+  transition: transform .18s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Flags row */
+.flags {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+.flags img {
+  width: 25px;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Responsive type that scales up on large screens */
+.country {
+  font-size: clamp(1rem, 1.3vw, 1.3rem);
+  font-weight: 700;
+}
+.time {
+  font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+  font-weight: 750;
+}
+.utc, .date {
+  font-size: clamp(.75rem, .95vw, .95rem);
+  font-weight: 500;
+  color: inherit;
+}
+
+/* India card always green */
+.bar-chip[data-country="India"] {
+  background-color: #008000; /* green */
+  color: white;              /* readable text */
+}
+.card[data-tz="Asia/Kolkata"] {
+  background-color: #008000;
+  color: white;
+}
+.card[data-tz="Asia/Kolkata"] .utc,
+.card[data-tz="Asia/Kolkata"] .date {
+  color: white;
+}
+
+/* ===== Legend (full width, centered) ===== */
+.center-bar-chip {
+  grid-column: 4 / 7;      /* center in 9-column grid */
+  border-radius: 16px;
+  background: var(--card-bg);
+  color: var(--text);
+  text-align: center;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;                 /* space between box and text */
+}
+
+.legend-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px solid #ccc;
+}
+.legend-box.red { background-color: red; }
+.legend-box.black { background-color: black; }
+.legend-box.grey { background-color: grey; }
+.legend-text {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
